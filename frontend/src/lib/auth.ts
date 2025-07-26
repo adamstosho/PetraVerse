@@ -39,7 +39,6 @@ export const authAPI = {
     try {
       await api.post('/auth/logout');
     } catch (error) {
-      // Ignore logout errors
     } finally {
       localStorage.removeItem('token');
       localStorage.removeItem('user');

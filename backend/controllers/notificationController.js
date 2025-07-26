@@ -1,16 +1,13 @@
 const asyncHandler = require('express-async-handler');
 const Notification = require('../models/Notification');
 
-// @desc    Get user notifications
-// @route   GET /api/notifications
-// @access  Private
+
 const getNotifications = asyncHandler(async (req, res) => {
   const { page = 1, limit = 20, isRead } = req.query;
   const skip = (page - 1) * limit;
 
   let query = { recipient: req.user._id };
 
-  // Filter by read status
   if (isRead !== undefined) {
     query.isRead = isRead === 'true';
   }
@@ -39,9 +36,7 @@ const getNotifications = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get unread notifications count
-// @route   GET /api/notifications/unread-count
-// @access  Private
+
 const getUnreadCount = asyncHandler(async (req, res) => {
   const count = await Notification.getUnreadCount(req.user._id);
 
@@ -53,9 +48,7 @@ const getUnreadCount = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Mark notification as read
-// @route   PATCH /api/notifications/:id/read
-// @access  Private
+
 const markAsRead = asyncHandler(async (req, res) => {
   const notification = await Notification.findById(req.params.id);
 
@@ -64,7 +57,6 @@ const markAsRead = asyncHandler(async (req, res) => {
     throw new Error('Notification not found');
   }
 
-  // Check ownership
   if (notification.recipient.toString() !== req.user._id.toString()) {
     res.status(403);
     throw new Error('Not authorized to access this notification');
@@ -81,9 +73,6 @@ const markAsRead = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Mark all notifications as read
-// @route   PATCH /api/notifications/mark-all-read
-// @access  Private
 const markAllAsRead = asyncHandler(async (req, res) => {
   await Notification.markAllAsRead(req.user._id);
 
@@ -93,9 +82,6 @@ const markAllAsRead = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Delete notification
-// @route   DELETE /api/notifications/:id
-// @access  Private
 const deleteNotification = asyncHandler(async (req, res) => {
   const notification = await Notification.findById(req.params.id);
 
@@ -104,7 +90,6 @@ const deleteNotification = asyncHandler(async (req, res) => {
     throw new Error('Notification not found');
   }
 
-  // Check ownership
   if (notification.recipient.toString() !== req.user._id.toString()) {
     res.status(403);
     throw new Error('Not authorized to delete this notification');
@@ -118,9 +103,6 @@ const deleteNotification = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get notification by ID
-// @route   GET /api/notifications/:id
-// @access  Private
 const getNotification = asyncHandler(async (req, res) => {
   const notification = await Notification.findById(req.params.id)
     .populate('sender', 'name email profilePicture')
@@ -132,13 +114,11 @@ const getNotification = asyncHandler(async (req, res) => {
     throw new Error('Notification not found');
   }
 
-  // Check ownership
   if (notification.recipient.toString() !== req.user._id.toString()) {
     res.status(403);
     throw new Error('Not authorized to access this notification');
   }
 
-  // Mark as read if not already read
   if (!notification.isRead) {
     await notification.markAsRead();
   }

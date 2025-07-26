@@ -22,29 +22,24 @@ export const notificationsAPI = {
     return response;
   },
 
-  // Get unread notifications count
   getUnreadCount: async (): Promise<{ count: number }> => {
     const response = await apiCall(api.get('/notifications/unread-count'));
     return response;
   },
 
-  // Get notification by ID
   getNotification: async (notificationId: string): Promise<{ notification: Notification }> => {
     const response = await apiCall(api.get(`/notifications/${notificationId}`));
     return response;
   },
 
-  // Mark notification as read
   markAsRead: async (notificationId: string): Promise<void> => {
     await apiCall(api.patch(`/notifications/${notificationId}/read`));
   },
 
-  // Mark all notifications as read
   markAllAsRead: async (): Promise<void> => {
     await apiCall(api.patch('/notifications/mark-all-read'));
   },
 
-  // Delete notification
   deleteNotification: async (notificationId: string): Promise<void> => {
     await apiCall(api.delete(`/notifications/${notificationId}`));
   }

@@ -1,4 +1,3 @@
-// Environment configuration
 export const config = {
   API_BASE_URL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api',
   APP_NAME: import.meta.env.VITE_APP_NAME || 'PetConnect',
@@ -6,7 +5,6 @@ export const config = {
   NODE_ENV: import.meta.env.NODE_ENV || 'development',
 };
 
-// API endpoints
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/auth/login',
@@ -66,7 +64,6 @@ export const API_ENDPOINTS = {
   },
 };
 
-// Validation rules
 export const VALIDATION_RULES = {
   PASSWORD: {
     MIN_LENGTH: 6,
@@ -84,21 +81,18 @@ export const VALIDATION_RULES = {
   },
 };
 
-// File upload limits
 export const UPLOAD_LIMITS = {
-  MAX_FILE_SIZE: 5 * 1024 * 1024, // 5MB
+  MAX_FILE_SIZE: 5 * 1024 * 1024, 
   MAX_FILES: 10,
   ALLOWED_TYPES: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
 };
 
-// Pagination defaults
 export const PAGINATION = {
   DEFAULT_PAGE: 1,
   DEFAULT_LIMIT: 20,
   MAX_LIMIT: 100,
 };
 
-// Status colors
 export const STATUS_COLORS = {
   missing: 'bg-red-100 text-red-800',
   found: 'bg-green-100 text-green-800',
@@ -109,7 +103,6 @@ export const STATUS_COLORS = {
   dismissed: 'bg-red-100 text-red-800',
 };
 
-// Priority colors
 export const PRIORITY_COLORS = {
   low: 'bg-green-100 text-green-800',
   medium: 'bg-yellow-100 text-yellow-800',

@@ -147,7 +147,7 @@ const SearchPage: React.FC = () => {
       await petsAPI.markAsReunited(selectedPet._id);
       toast.success('Pet marked as reunited successfully!');
       setShowReunitedModal(false);
-      fetchPets(); // Refresh the list
+      fetchPets(); 
     } catch (error: any) {
       toast.error(error.message || 'Failed to mark pet as reunited');
     } finally {

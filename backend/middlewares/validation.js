@@ -42,7 +42,6 @@ const validateRegister = [
   handleValidationErrors
 ];
 
-// User login validation
 const validateLogin = [
   body('email')
     .isEmail()
@@ -56,7 +55,6 @@ const validateLogin = [
   handleValidationErrors
 ];
 
-// User profile update validation
 const validateProfileUpdate = [
   body('name')
     .optional()
@@ -98,7 +96,6 @@ const validateProfileUpdate = [
   handleValidationErrors
 ];
 
-// Password reset request validation
 const validatePasswordResetRequest = [
   body('email')
     .isEmail()
@@ -108,7 +105,6 @@ const validatePasswordResetRequest = [
   handleValidationErrors
 ];
 
-// Password reset validation
 const validatePasswordReset = [
   body('password')
     .isLength({ min: 6 })
@@ -127,7 +123,6 @@ const validatePasswordReset = [
   handleValidationErrors
 ];
 
-// Pet creation/update validation
 const validatePet = [
   body('name')
     .trim()
@@ -186,7 +181,7 @@ const validatePet = [
     .isArray({ min: 2, max: 2 })
     .withMessage('Coordinates must be an array with exactly 2 elements')
     .custom((value) => {
-      if (!value) return true; // Allow empty coordinates
+      if (!value) return true; 
       const [lng, lat] = value;
       if (lng < -180 || lng > 180) {
         throw new Error('Longitude must be between -180 and 180');
@@ -270,7 +265,6 @@ const validatePet = [
   handleValidationErrors
 ];
 
-// Pet search validation
 const validatePetSearch = [
   query('status')
     .optional()
@@ -356,7 +350,6 @@ const validatePetSearch = [
   handleValidationErrors
 ];
 
-// Contact request validation
 const validateContactRequest = [
   body('name')
     .trim()
@@ -381,7 +374,6 @@ const validateContactRequest = [
   handleValidationErrors
 ];
 
-// Report validation
 const validateReport = [
   body('type')
     .isIn(['user', 'pet_post', 'spam', 'inappropriate', 'fake', 'duplicate', 'other'])
@@ -418,7 +410,6 @@ const validateReport = [
     .isURL()
     .withMessage('Evidence must be a valid URL'),
   
-  // Custom validation to ensure at least one target is specified
   (req, res, next) => {
     if (!req.body.reportedUserId && !req.body.reportedPetId) {
       return res.status(400).json({
@@ -437,7 +428,6 @@ const validateReport = [
   handleValidationErrors
 ];
 
-// Admin action validation
 const validateAdminAction = [
   body('action')
     .isIn(['approve', 'edit', 'delete', 'warn', 'disable', 'ban'])
@@ -452,7 +442,6 @@ const validateAdminAction = [
   handleValidationErrors
 ];
 
-// Pagination validation
 const validatePagination = [
   query('page')
     .optional()
@@ -467,7 +456,6 @@ const validatePagination = [
   handleValidationErrors
 ];
 
-// Object ID validation
 const validateObjectId = [
   param('id')
     .isMongoId()

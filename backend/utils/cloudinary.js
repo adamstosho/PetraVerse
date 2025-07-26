@@ -2,14 +2,12 @@ const cloudinary = require('cloudinary').v2;
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const multer = require('multer');
 
-// Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// Configure storage for multer
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
@@ -22,20 +20,17 @@ const storage = new CloudinaryStorage({
     ],
   },
   filename: function (req, file, cb) {
-    // Generate a unique filename
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, file.fieldname + '-' + uniqueSuffix);
   }
 });
 
-// Configure multer upload
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 5 * 1024 * 1024, 
   },
   fileFilter: (req, file, cb) => {
-    // Check file type
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
@@ -44,13 +39,10 @@ const upload = multer({
   },
 });
 
-// Upload single image
 const uploadSingle = upload.single('image');
 
-// Upload multiple images
-const uploadMultiple = upload.array('photos', 10); // Max 10 images
+const uploadMultiple = upload.array('photos', 10); 
 
-// Upload image with custom options
 const uploadImage = async (file, options = {}) => {
   try {
     const uploadOptions = {
@@ -78,7 +70,6 @@ const uploadImage = async (file, options = {}) => {
   }
 };
 
-// Upload multiple images
 const uploadMultipleImages = async (files, options = {}) => {
   try {
     const uploadPromises = files.map(file => uploadImage(file, options));
@@ -90,7 +81,6 @@ const uploadMultipleImages = async (files, options = {}) => {
   }
 };
 
-// Delete image by public_id
 const deleteImage = async (publicId) => {
   try {
     const result = await cloudinary.uploader.destroy(publicId);
@@ -101,12 +91,9 @@ const deleteImage = async (publicId) => {
   }
 };
 
-// Delete multiple images
 const deleteMultipleImages = async (imageUrls) => {
   try {
     const deletePromises = imageUrls.map(imageUrl => {
-      // Extract public ID from Cloudinary URL
-      // URL format: https://res.cloudinary.com/cloud_name/image/upload/v1234567890/folder/filename.jpg
       const urlParts = imageUrl.split('/');
       const uploadIndex = urlParts.findIndex(part => part === 'upload');
       
@@ -115,11 +102,9 @@ const deleteMultipleImages = async (imageUrls) => {
         return Promise.resolve(null);
       }
       
-      // Get everything after 'upload' and before the file extension
-      const publicIdParts = urlParts.slice(uploadIndex + 2); // Skip 'upload' and version
+      const publicIdParts = urlParts.slice(uploadIndex + 2); 
       let publicId = publicIdParts.join('/');
       
-      // Remove file extension
       const lastDotIndex = publicId.lastIndexOf('.');
       if (lastDotIndex !== -1) {
         publicId = publicId.substring(0, lastDotIndex);
@@ -136,7 +121,6 @@ const deleteMultipleImages = async (imageUrls) => {
   }
 };
 
-// Get image info
 const getImageInfo = async (publicId) => {
   try {
     const result = await cloudinary.api.resource(publicId);
@@ -147,7 +131,6 @@ const getImageInfo = async (publicId) => {
   }
 };
 
-// Transform image URL
 const transformImageUrl = (publicId, options = {}) => {
   try {
     const defaultOptions = {
@@ -166,7 +149,6 @@ const transformImageUrl = (publicId, options = {}) => {
   }
 };
 
-// Generate thumbnail URL
 const generateThumbnailUrl = (publicId, width = 200, height = 200) => {
   return transformImageUrl(publicId, {
     width,
@@ -176,7 +158,6 @@ const generateThumbnailUrl = (publicId, width = 200, height = 200) => {
   });
 };
 
-// Generate responsive image URLs
 const generateResponsiveUrls = (publicId) => {
   const sizes = [
     { width: 320, height: 240, suffix: 'sm' },
@@ -193,7 +174,6 @@ const generateResponsiveUrls = (publicId) => {
   }));
 };
 
-// Optimize image for web
 const optimizeForWeb = (publicId) => {
   return transformImageUrl(publicId, {
     quality: 'auto',
@@ -202,7 +182,6 @@ const optimizeForWeb = (publicId) => {
   });
 };
 
-// Create image with watermark
 const addWatermark = (publicId, watermarkText = 'Pet Adoption Network') => {
   return transformImageUrl(publicId, {
     overlay: {
@@ -219,11 +198,8 @@ const addWatermark = (publicId, watermarkText = 'Pet Adoption Network') => {
   });
 };
 
-// Clean up unused images (helper function)
 const cleanupUnusedImages = async (usedPublicIds) => {
   try {
-    // This would require additional logic to track unused images
-    // For now, this is a placeholder for future implementation
     console.log('Cleanup function called with used public IDs:', usedPublicIds);
   } catch (error) {
     console.error('Error cleaning up unused images:', error);

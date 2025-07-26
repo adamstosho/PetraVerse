@@ -2,20 +2,15 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('express-async-handler');
 const User = require('../models/User');
 
-// Protect routes - require authentication
 const protect = asyncHandler(async (req, res, next) => {
   let token;
 
-  // Check for token in headers
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
-      // Get token from header
       token = req.headers.authorization.split(' ')[1];
 
-      // Verify token
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      // Get user from token
       req.user = await User.findById(decoded.id).select('-password');
 
       if (!req.user) {
@@ -23,7 +18,6 @@ const protect = asyncHandler(async (req, res, next) => {
         throw new Error('User not found');
       }
 
-      // Check if user is active
       if (!req.user.isActive) {
         res.status(401);
         throw new Error('Account is deactivated');
@@ -43,7 +37,6 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 });
 
-// Optional authentication - doesn't require token but adds user if present
 const optionalAuth = asyncHandler(async (req, res, next) => {
   let token;
 
@@ -53,7 +46,6 @@ const optionalAuth = asyncHandler(async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id).select('-password');
     } catch (error) {
-      // Token is invalid but we don't throw error for optional auth
       console.log('Optional auth token invalid:', error.message);
     }
   }
@@ -61,7 +53,6 @@ const optionalAuth = asyncHandler(async (req, res, next) => {
   next();
 });
 
-// Authorize roles
 const authorize = (...roles) => {
   return (req, res, next) => {
     if (!req.user) {
@@ -78,7 +69,6 @@ const authorize = (...roles) => {
   };
 };
 
-// Check if user owns the resource or is admin
 const checkOwnership = (modelName) => {
   return asyncHandler(async (req, res, next) => {
     const resourceId = req.params.id;
@@ -91,13 +81,11 @@ const checkOwnership = (modelName) => {
       throw new Error(`${modelName} not found`);
     }
 
-    // Admin can access any resource
     if (req.user.role === 'admin') {
       req.resource = resource;
       return next();
     }
 
-    // Check if user owns the resource
     const ownerField = modelName === 'User' ? '_id' : 'owner';
     if (resource[ownerField].toString() !== req.user._id.toString()) {
       res.status(403);
@@ -109,23 +97,20 @@ const checkOwnership = (modelName) => {
   });
 };
 
-// Rate limiting for authentication attempts
 const authRateLimit = {
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // limit each IP to 5 requests per windowMs
+  windowMs: 15 * 60 * 1000, 
+  max: 5, 
   message: 'Too many authentication attempts, please try again later',
   standardHeaders: true,
   legacyHeaders: false,
 };
 
-// Generate JWT token
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
-// Verify email verification token
 const verifyEmailToken = asyncHandler(async (req, res, next) => {
   const { token } = req.params;
 
@@ -156,7 +141,6 @@ const verifyEmailToken = asyncHandler(async (req, res, next) => {
   }
 });
 
-// Verify password reset token
 const verifyPasswordResetToken = asyncHandler(async (req, res, next) => {
   const { token } = req.params;
 

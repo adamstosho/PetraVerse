@@ -31,7 +31,7 @@ const reportSchema = new mongoose.Schema({
     maxlength: [1000, 'Description cannot be more than 1000 characters']
   },
   evidence: [{
-    type: String, // URLs to evidence files/images
+    type: String,
     trim: true
   }],
   status: {
@@ -87,17 +87,14 @@ reportSchema.index({ reportedPet: 1 });
 reportSchema.index({ createdAt: -1 });
 reportSchema.index({ isResolved: 1 });
 
-// Virtual to check if report is about a user
 reportSchema.virtual('isUserReport').get(function() {
   return this.type === 'user' || this.reportedUser;
 });
 
-// Virtual to check if report is about a pet post
 reportSchema.virtual('isPetReport').get(function() {
   return this.type === 'pet_post' || this.reportedPet;
 });
 
-// Method to assign to admin
 reportSchema.methods.assignToAdmin = function(adminId) {
   this.status = 'under_review';
   this.reviewedBy = adminId;
@@ -105,7 +102,6 @@ reportSchema.methods.assignToAdmin = function(adminId) {
   return this.save();
 };
 
-// Method to resolve report
 reportSchema.methods.resolve = function(data) {
   this.status = 'resolved';
   this.isResolved = true;
@@ -117,7 +113,6 @@ reportSchema.methods.resolve = function(data) {
   return this.save();
 };
 
-// Method to dismiss report
 reportSchema.methods.dismiss = function(adminId, notes) {
   this.status = 'dismissed';
   this.isResolved = true;
@@ -128,7 +123,6 @@ reportSchema.methods.dismiss = function(adminId, notes) {
   return this.save();
 };
 
-// Static method to get reports by status
 reportSchema.statics.getReportsByStatus = function(status, page = 1, limit = 20) {
   const skip = (page - 1) * limit;
   
@@ -143,12 +137,10 @@ reportSchema.statics.getReportsByStatus = function(status, page = 1, limit = 20)
     .populate('actionTakenBy', 'name email');
 };
 
-// Static method to get pending reports count
 reportSchema.statics.getPendingCount = function() {
   return this.countDocuments({ status: 'pending' });
 };
 
-// Static method to get high priority reports
 reportSchema.statics.getHighPriorityReports = function() {
   return this.find({
     priority: { $in: ['high', 'urgent'] },
@@ -160,7 +152,6 @@ reportSchema.statics.getHighPriorityReports = function() {
   .populate('reportedPet', 'name type breed');
 };
 
-// Static method to get reports by user
 reportSchema.statics.getReportsByUser = function(userId) {
   return this.find({
     $or: [
@@ -174,7 +165,6 @@ reportSchema.statics.getReportsByUser = function(userId) {
   .populate('reportedPet', 'name type breed');
 };
 
-// Static method to get reports by pet
 reportSchema.statics.getReportsByPet = function(petId) {
   return this.find({ reportedPet: petId })
     .sort({ createdAt: -1 })
@@ -182,7 +172,6 @@ reportSchema.statics.getReportsByPet = function(petId) {
     .populate('reviewedBy', 'name email');
 };
 
-// Static method to check if user has been reported recently
 reportSchema.statics.hasRecentReports = function(userId, days = 7) {
   const cutoffDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
   

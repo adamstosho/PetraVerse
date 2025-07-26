@@ -5,11 +5,8 @@ const Notification = require('../models/Notification');
 const { sendEmail } = require('../utils/emailService');
 const { deleteMultipleImages } = require('../utils/cloudinary');
 
-// @desc    Create a new pet post
-// @route   POST /api/pets
-// @access  Private
+
 const createPet = asyncHandler(async (req, res) => {
-  // Debug: Log what we're receiving
   console.log('Files received:', req.files);
   console.log('Body received:', req.body);
   console.log('Cloudinary config:', {
@@ -18,10 +15,8 @@ const createPet = asyncHandler(async (req, res) => {
     api_secret: process.env.CLOUDINARY_API_SECRET ? 'SET' : 'NOT SET'
   });
 
-  // Handle photo uploads
   const photos = req.files ? req.files.map(file => {
     console.log('File object:', file);
-    // CloudinaryStorage might return different structures
     if (file.secure_url) {
       return file.secure_url;
     } else if (file.url) {
@@ -41,7 +36,6 @@ const createPet = asyncHandler(async (req, res) => {
     throw new Error('At least one photo is required');
   }
 
-  // Parse FormData fields that might be JSON strings
   let lastSeenLocation = req.body.lastSeenLocation;
   if (typeof lastSeenLocation === 'string') {
     try {
@@ -70,39 +64,34 @@ const createPet = asyncHandler(async (req, res) => {
     }
   }
 
-  // Set default coordinates if not provided
   if (!lastSeenLocation.coordinates) {
     lastSeenLocation.coordinates = {
       type: 'Point',
-      coordinates: [0, 0] // Default coordinates
+      coordinates: [0, 0] 
     };
   } else if (lastSeenLocation.coordinates && !lastSeenLocation.coordinates.coordinates) {
-    // If coordinates object exists but doesn't have the coordinates array
     lastSeenLocation.coordinates = {
       type: 'Point',
-      coordinates: [0, 0] // Default coordinates
+      coordinates: [0, 0] 
     };
   } else if (Array.isArray(lastSeenLocation.coordinates)) {
-    // If coordinates is just an array, wrap it properly
     lastSeenLocation.coordinates = {
       type: 'Point',
       coordinates: lastSeenLocation.coordinates
     };
   }
 
-  // Ensure coordinates array has exactly 2 numbers
   if (lastSeenLocation.coordinates && lastSeenLocation.coordinates.coordinates) {
     const coords = lastSeenLocation.coordinates.coordinates;
     if (!Array.isArray(coords) || coords.length !== 2 || 
         typeof coords[0] !== 'number' || typeof coords[1] !== 'number') {
       lastSeenLocation.coordinates = {
         type: 'Point',
-        coordinates: [0, 0] // Default coordinates
+        coordinates: [0, 0] 
       };
     }
   }
 
-  // Validate required fields manually
   if (!req.body.name || req.body.name.trim().length === 0) {
     res.status(400);
     throw new Error('Pet name is required');
@@ -169,7 +158,6 @@ const createPet = asyncHandler(async (req, res) => {
     tags
   });
 
-  // Auto-approve for admin users
   if (req.user.role === 'admin') {
     pet.isApproved = true;
     pet.approvedBy = req.user._id;
@@ -188,9 +176,7 @@ const createPet = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get all pets with filters
-// @route   GET /api/pets
-// @access  Public
+
 const getPets = asyncHandler(async (req, res) => {
   const {
     status,
@@ -211,21 +197,18 @@ const getPets = asyncHandler(async (req, res) => {
 
   let query = { isActive: true };
 
-  // Apply filters
   if (status) query.status = status;
   if (type) query.type = type;
   if (breed) query.breed = { $regex: breed, $options: 'i' };
   if (color) query.color = { $regex: color, $options: 'i' };
   if (gender) query.gender = gender;
 
-  // Date range filter
   if (dateFrom || dateTo) {
     query.lastSeenDate = {};
     if (dateFrom) query.lastSeenDate.$gte = new Date(dateFrom);
     if (dateTo) query.lastSeenDate.$lte = new Date(dateTo);
   }
 
-  // Location-based search
   if (latitude && longitude) {
     query['lastSeenLocation.coordinates'] = {
       $near: {
@@ -233,12 +216,11 @@ const getPets = asyncHandler(async (req, res) => {
           type: 'Point',
           coordinates: [parseFloat(longitude), parseFloat(latitude)]
         },
-        $maxDistance: parseFloat(radius) * 1000 // Convert km to meters
+        $maxDistance: parseFloat(radius) * 1000 
       }
     };
   }
 
-  // Only show approved pets to non-admin users
   if (!req.user || req.user.role !== 'admin') {
     query.isApproved = true;
   }
@@ -265,9 +247,7 @@ const getPets = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get single pet
-// @route   GET /api/pets/:id
-// @access  Public
+
 const getPet = asyncHandler(async (req, res) => {
   const pet = await Pet.findById(req.params.id)
     .populate('owner', 'name email phone')
@@ -278,14 +258,11 @@ const getPet = asyncHandler(async (req, res) => {
     throw new Error('Pet not found');
   }
 
-  // For a lost & found network, all pet posts should be publicly viewable
-  // Only hide posts that are inactive or deleted
   if (!pet.isActive) {
     res.status(404);
     throw new Error('Pet post not found or has been removed');
   }
 
-  // Increment views
   await pet.incrementViews();
 
   res.json({
@@ -296,9 +273,6 @@ const getPet = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Update pet
-// @route   PUT /api/pets/:id
-// @access  Private
 const updatePet = asyncHandler(async (req, res) => {
   const pet = await Pet.findById(req.params.id);
 
@@ -307,7 +281,6 @@ const updatePet = asyncHandler(async (req, res) => {
     throw new Error('Pet not found');
   }
 
-  // Check ownership or admin
   if (pet.owner.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
     res.status(403);
     throw new Error('Not authorized to update this pet');
@@ -332,10 +305,8 @@ const updatePet = asyncHandler(async (req, res) => {
     tags
   } = req.body;
 
-  // Handle photo uploads
   const newPhotos = req.files ? req.files.map(file => {
     console.log('File object:', file);
-    // CloudinaryStorage might return different structures
     if (file.secure_url) {
       return file.secure_url;
     } else if (file.url) {
@@ -350,7 +321,6 @@ const updatePet = asyncHandler(async (req, res) => {
   const existingPhotos = req.body.photos ? JSON.parse(req.body.photos) : pet.photos;
   const photos = [...existingPhotos, ...newPhotos];
 
-  // Update pet
   pet.name = name || pet.name;
   pet.type = type || pet.type;
   pet.breed = breed || pet.breed;
@@ -369,7 +339,6 @@ const updatePet = asyncHandler(async (req, res) => {
   pet.collar = collar || pet.collar;
   pet.tags = tags || pet.tags;
 
-  // Reset approval status if updated by non-admin
   if (req.user.role !== 'admin') {
     pet.isApproved = false;
     pet.approvedBy = undefined;
@@ -379,7 +348,6 @@ const updatePet = asyncHandler(async (req, res) => {
   const updatedPet = await pet.save();
   await updatedPet.populate('owner', 'name email phone');
 
-  // Send notification to owner if edited by admin
   if (req.user.role === 'admin' && pet.owner.toString() !== req.user._id.toString()) {
     try {
       await Notification.createNotification({
@@ -409,9 +377,6 @@ const updatePet = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Delete pet
-// @route   DELETE /api/pets/:id
-// @access  Private
 const deletePet = asyncHandler(async (req, res) => {
   const pet = await Pet.findById(req.params.id);
 
@@ -420,13 +385,11 @@ const deletePet = asyncHandler(async (req, res) => {
     throw new Error('Pet not found');
   }
 
-  // Check ownership or admin
   if (pet.owner.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
     res.status(403);
     throw new Error('Not authorized to delete this pet');
   }
 
-  // Delete photos from Cloudinary
   if (pet.photos && pet.photos.length > 0) {
     try {
       await deleteMultipleImages(pet.photos);
@@ -443,9 +406,6 @@ const deletePet = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Mark pet as reunited
-// @route   PATCH /api/pets/:id/reunite
-// @access  Private
 const markAsReunited = asyncHandler(async (req, res) => {
   const pet = await Pet.findById(req.params.id);
 
@@ -454,7 +414,6 @@ const markAsReunited = asyncHandler(async (req, res) => {
     throw new Error('Pet not found');
   }
 
-  // Check ownership or admin
   if (pet.owner.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
     res.status(403);
     throw new Error('Not authorized to update this pet');
@@ -472,9 +431,6 @@ const markAsReunited = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Contact pet owner
-// @route   POST /api/pets/:id/contact
-// @access  Public
 const contactOwner = asyncHandler(async (req, res) => {
   const { name, email, phone, message } = req.body;
 
@@ -491,10 +447,8 @@ const contactOwner = asyncHandler(async (req, res) => {
     throw new Error('Cannot contact owner of unapproved post');
   }
 
-  // Increment contact count
   await pet.incrementContactCount();
 
-  // Send email to pet owner
   try {
     const contactInfo = { name, email, phone, message };
     await sendEmail(pet.owner.email, 'contactRequest', pet.owner.name, pet.name, contactInfo);
@@ -504,7 +458,6 @@ const contactOwner = asyncHandler(async (req, res) => {
     throw new Error('Error sending contact email');
   }
 
-  // Create notification
   try {
     await Notification.createNotification({
       recipient: pet.owner._id,
@@ -524,9 +477,6 @@ const contactOwner = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Search pets by location
-// @route   GET /api/pets/search/nearby
-// @access  Public
 const searchNearby = asyncHandler(async (req, res) => {
   const { latitude, longitude, radius = 10, page = 1, limit = 20 } = req.query;
 
@@ -543,7 +493,6 @@ const searchNearby = asyncHandler(async (req, res) => {
     .skip(skip)
     .limit(parseInt(limit));
 
-  // Use the same aggregation for counting to avoid geospatial query conflicts
   const totalResult = await Pet.aggregate([
     {
       $geoNear: {
@@ -608,9 +557,6 @@ const getMyPets = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Approve pet post (admin only)
-// @route   PATCH /api/pets/:id/approve
-// @access  Private/Admin
 const approvePet = asyncHandler(async (req, res) => {
   const pet = await Pet.findById(req.params.id)
     .populate('owner', 'name email');
@@ -625,7 +571,6 @@ const approvePet = asyncHandler(async (req, res) => {
   pet.approvedAt = new Date();
   await pet.save();
 
-  // Send notification to owner
   try {
     await Notification.createNotification({
       recipient: pet.owner._id,

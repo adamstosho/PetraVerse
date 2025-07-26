@@ -331,7 +331,6 @@ const deletePet = asyncHandler(async (req, res) => {
     throw new Error('Pet not found');
   }
 
-  // Delete photos from Cloudinary
   if (pet.photos && pet.photos.length > 0) {
     try {
       await deleteMultipleImages(pet.photos);
@@ -426,13 +425,11 @@ const updateReport = asyncHandler(async (req, res) => {
     throw new Error('Report not found');
   }
 
-  // Validate status if provided
   if (status && !['pending', 'under_review', 'resolved', 'dismissed'].includes(status)) {
     res.status(400);
     throw new Error('Invalid status value');
   }
 
-  // Validate priority if provided
   if (priority && !['low', 'medium', 'high', 'urgent'].includes(priority)) {
     res.status(400);
     throw new Error('Invalid priority value');

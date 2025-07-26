@@ -5,9 +5,6 @@ const Pet = require('../models/Pet');
 const Notification = require('../models/Notification');
 const { sendEmail } = require('../utils/emailService');
 
-// @desc    Create a new report
-// @route   POST /api/reports
-// @access  Private
 const createReport = asyncHandler(async (req, res) => {
   const {
     type,
@@ -18,19 +15,16 @@ const createReport = asyncHandler(async (req, res) => {
     evidence
   } = req.body;
 
-  // Validate that at least one target is specified
   if (!reportedUserId && !reportedPetId) {
     res.status(400);
     throw new Error('Must specify either a user or pet to report');
   }
 
-  // Check if user is reporting themselves
   if (reportedUserId && reportedUserId === req.user._id.toString()) {
     res.status(400);
     throw new Error('Cannot report yourself');
   }
 
-  // Check if user is reporting their own pet
   if (reportedPetId) {
     const pet = await Pet.findById(reportedPetId);
     if (pet && pet.owner.toString() === req.user._id.toString()) {
@@ -39,14 +33,13 @@ const createReport = asyncHandler(async (req, res) => {
     }
   }
 
-  // Check if user has already reported this target recently
   const existingReport = await Report.findOne({
     reporter: req.user._id,
     $or: [
       { reportedUser: reportedUserId },
       { reportedPet: reportedPetId }
     ],
-    createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // Last 24 hours
+    createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } 
   });
 
   if (existingReport) {
@@ -70,7 +63,6 @@ const createReport = asyncHandler(async (req, res) => {
     { path: 'reportedPet', select: 'name type breed' }
   ]);
 
-  // Send notification to reporter
   try {
     await Notification.createNotification({
       recipient: req.user._id,
@@ -97,9 +89,6 @@ const createReport = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Get user's reports
-// @route   GET /api/reports
-// @access  Private
 const getUserReports = asyncHandler(async (req, res) => {
   const { page = 1, limit = 20, status } = req.query;
   const skip = (page - 1) * limit;
@@ -178,13 +167,11 @@ const updateReport = asyncHandler(async (req, res) => {
     throw new Error('Report not found');
   }
 
-  // Only reporter can update their own report
   if (report.reporter.toString() !== req.user._id.toString()) {
     res.status(403);
     throw new Error('Not authorized to update this report');
   }
 
-  // Can only update if report is still pending
   if (report.status !== 'pending') {
     res.status(400);
     throw new Error('Cannot update a report that has been reviewed');
@@ -275,7 +262,6 @@ const getReportsAboutMyPets = asyncHandler(async (req, res) => {
   const { page = 1, limit = 20, status } = req.query;
   const skip = (page - 1) * limit;
 
-  // Get user's pet IDs
   const userPets = await Pet.find({ owner: req.user._id }).select('_id');
   const petIds = userPets.map(pet => pet._id);
 

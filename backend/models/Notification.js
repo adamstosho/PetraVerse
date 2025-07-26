@@ -62,34 +62,30 @@ const notificationSchema = new mongoose.Schema({
   expiresAt: {
     type: Date,
     default: function() {
-      return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
+      return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); 
     }
   }
 }, {
   timestamps: true
 });
 
-// Indexes for better query performance
 notificationSchema.index({ recipient: 1, isRead: 1 });
 notificationSchema.index({ recipient: 1, createdAt: -1 });
 notificationSchema.index({ type: 1 });
 notificationSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-// Method to mark as read
 notificationSchema.methods.markAsRead = function() {
   this.isRead = true;
   this.readAt = new Date();
   return this.save();
 };
 
-// Method to mark email as sent
 notificationSchema.methods.markEmailSent = function() {
   this.isEmailSent = true;
   this.emailSentAt = new Date();
   return this.save();
 };
 
-// Static method to get unread notifications count
 notificationSchema.statics.getUnreadCount = function(userId) {
   return this.countDocuments({
     recipient: userId,
@@ -98,7 +94,6 @@ notificationSchema.statics.getUnreadCount = function(userId) {
   });
 };
 
-// Static method to get notifications for user
 notificationSchema.statics.getUserNotifications = function(userId, page = 1, limit = 20) {
   const skip = (page - 1) * limit;
   
@@ -114,7 +109,6 @@ notificationSchema.statics.getUserNotifications = function(userId, page = 1, lim
   .populate('relatedReport', 'type reason');
 };
 
-// Static method to create notification
 notificationSchema.statics.createNotification = function(data) {
   return this.create({
     recipient: data.recipient,
@@ -128,12 +122,10 @@ notificationSchema.statics.createNotification = function(data) {
   });
 };
 
-// Static method to create multiple notifications
 notificationSchema.statics.createMultipleNotifications = function(notifications) {
   return this.insertMany(notifications);
 };
 
-// Static method to mark all notifications as read
 notificationSchema.statics.markAllAsRead = function(userId) {
   return this.updateMany(
     { recipient: userId, isRead: false },
@@ -141,7 +133,6 @@ notificationSchema.statics.markAllAsRead = function(userId) {
   );
 };
 
-// Static method to delete old notifications
 notificationSchema.statics.cleanupOldNotifications = function() {
   return this.deleteMany({
     expiresAt: { $lt: new Date() }

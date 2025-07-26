@@ -61,12 +61,10 @@ const userSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index for better query performance
 userSchema.index({ email: 1 });
 userSchema.index({ role: 1 });
 userSchema.index({ isActive: 1 });
 
-// Virtual for full address
 userSchema.virtual('fullAddress').get(function() {
   const address = this.address;
   if (!address) return '';
@@ -75,7 +73,6 @@ userSchema.virtual('fullAddress').get(function() {
   return parts.filter(part => part).join(', ');
 });
 
-// Pre-save middleware to hash password
 userSchema.pre('save', async function(next) {
   if (!this.isModified('password')) return next();
   
@@ -88,12 +85,10 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-// Method to compare password
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Method to get public profile (without sensitive data)
 userSchema.methods.getPublicProfile = function() {
   const userObject = this.toObject();
   delete userObject.password;

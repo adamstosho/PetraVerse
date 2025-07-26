@@ -13,11 +13,9 @@ function App() {
       
       if (token && userStr) {
         try {
-          // Verify token is still valid by fetching current user
           const response = await authAPI.getCurrentUser();
           setAuth(response.user, token);
         } catch (error) {
-          // Token is invalid, clear auth
           clearAuth();
         }
       } else {

@@ -20,7 +20,6 @@ const {
   validateObjectId
 } = require('../middlewares/validation');
 
-// All routes require authentication
 router.use(protect);
 
 router.post('/', validateReport, createReport);

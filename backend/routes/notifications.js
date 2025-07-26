@@ -18,7 +18,6 @@ const {
   validateObjectId
 } = require('../middlewares/validation');
 
-// All routes require authentication
 router.use(protect);
 
 router.get('/', validatePagination, getNotifications);

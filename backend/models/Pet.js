@@ -77,10 +77,10 @@ const petSchema = new mongoose.Schema({
       },
       coordinates: {
         type: [Number],
-        required: false, // Make coordinates optional
+        required: false,
         validate: {
           validator: function(v) {
-            if (!v) return true; // Allow empty coordinates
+            if (!v) return true; 
             return v.length === 2 && v[0] >= -180 && v[0] <= 180 && v[1] >= -90 && v[1] <= 90;
           },
           message: 'Invalid coordinates'
@@ -141,7 +141,6 @@ const petSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes for better query performance
 petSchema.index({ status: 1 });
 petSchema.index({ type: 1 });
 petSchema.index({ breed: 1 });
@@ -153,19 +152,16 @@ petSchema.index({ isApproved: 1 });
 petSchema.index({ isActive: 1 });
 petSchema.index({ owner: 1 });
 
-// Virtual for age display
 petSchema.virtual('ageDisplay').get(function() {
   if (!this.age) return 'Unknown';
   return `${this.age} ${this.ageUnit}`;
 });
 
-// Virtual for weight display
 petSchema.virtual('weightDisplay').get(function() {
   if (!this.weight) return 'Unknown';
   return `${this.weight} ${this.weightUnit}`;
 });
 
-// Virtual for full location
 petSchema.virtual('fullLocation').get(function() {
   const location = this.lastSeenLocation;
   if (!location) return '';
@@ -174,19 +170,16 @@ petSchema.virtual('fullLocation').get(function() {
   return parts.filter(part => part).join(', ');
 });
 
-// Method to increment views
 petSchema.methods.incrementViews = function() {
   this.views += 1;
   return this.save();
 };
 
-// Method to increment contact count
 petSchema.methods.incrementContactCount = function() {
   this.contactCount += 1;
   return this.save();
 };
 
-// Method to approve post
 petSchema.methods.approve = function(adminId) {
   this.isApproved = true;
   this.approvedBy = adminId;
@@ -194,13 +187,11 @@ petSchema.methods.approve = function(adminId) {
   return this.save();
 };
 
-// Method to mark as reunited
 petSchema.methods.markAsReunited = function() {
   this.status = 'reunited';
   return this.save();
 };
 
-// Static method to find pets within radius
 petSchema.statics.findNearby = function(coordinates, radiusInKm = 10) {
   return this.find({
     'lastSeenLocation.coordinates': {
@@ -209,7 +200,7 @@ petSchema.statics.findNearby = function(coordinates, radiusInKm = 10) {
           type: 'Point',
           coordinates: coordinates
         },
-        $maxDistance: radiusInKm * 1000 // Convert km to meters
+        $maxDistance: radiusInKm * 1000 
       }
     },
     isActive: true,
@@ -217,7 +208,6 @@ petSchema.statics.findNearby = function(coordinates, radiusInKm = 10) {
   });
 };
 
-// Static method to search pets
 petSchema.statics.searchPets = function(filters) {
   const query = { isActive: true, isApproved: true };
   

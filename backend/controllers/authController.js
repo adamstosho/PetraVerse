@@ -26,7 +26,7 @@ const register = asyncHandler(async (req, res) => {
   if (user) {
     const emailVerificationToken = crypto.randomBytes(32).toString('hex');
     user.emailVerificationToken = emailVerificationToken;
-    user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+    user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; 
     await user.save();
 
     try {
@@ -123,7 +123,7 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   const resetToken = crypto.randomBytes(32).toString('hex');
   user.passwordResetToken = resetToken;
-  user.passwordResetExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+  user.passwordResetExpires = Date.now() + 60 * 60 * 1000; 
   await user.save();
 
   try {
@@ -245,13 +245,11 @@ const resendVerification = asyncHandler(async (req, res) => {
     throw new Error('Email is already verified');
   }
 
-  // Generate new verification token
   const emailVerificationToken = crypto.randomBytes(32).toString('hex');
   user.emailVerificationToken = emailVerificationToken;
-  user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
+  user.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; 
   await user.save();
 
-  // Send verification email
   try {
     const verificationLink = `${process.env.CLIENT_URL}/verify-email/${emailVerificationToken}`;
     await sendEmail(user.email, 'emailVerification', { 

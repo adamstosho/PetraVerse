@@ -1,4 +1,3 @@
-// Core types for the application
 export interface User {
   _id: string;
   name: string;

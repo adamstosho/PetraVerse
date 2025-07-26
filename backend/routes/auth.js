@@ -29,14 +29,12 @@ const {
   validatePasswordReset
 } = require('../middlewares/validation');
 
-// Public routes
 router.post('/register', validateRegister, register);
 router.post('/login', validateLogin, login);
 router.get('/verify-email/:token', verifyEmailToken, verifyEmail);
 router.post('/forgot-password', validatePasswordResetRequest, forgotPassword);
 router.post('/reset-password/:token', verifyPasswordResetToken, validatePasswordReset, resetPassword);
 
-// Protected routes
 router.get('/me', protect, getMe);
 router.put('/me', protect, validateProfileUpdate, updateProfile);
 router.put('/change-password', protect, validatePasswordReset, changePassword);

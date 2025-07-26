@@ -1,12 +1,11 @@
 const nodemailer = require('nodemailer');
 const path = require('path');
 
-// Create transporter
 const createTransporter = () => {
   return nodemailer.createTransport({
     host: process.env.EMAIL_HOST,
     port: process.env.EMAIL_PORT,
-    secure: false, // true for 465, false for other ports
+    secure: false, 
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
@@ -14,7 +13,6 @@ const createTransporter = () => {
   });
 };
 
-// Email templates
 const emailTemplates = {
   welcome: (userName) => ({
     subject: 'Welcome to Lost & Found Pet Network',
@@ -183,7 +181,6 @@ const emailTemplates = {
   })
 };
 
-// Send email function
 const sendEmail = async (to, template, ...args) => {
   try {
     const transporter = createTransporter();
@@ -213,7 +210,6 @@ const sendEmail = async (to, template, ...args) => {
   }
 };
 
-// Send bulk emails
 const sendBulkEmails = async (recipients, template, data = {}) => {
   try {
     const transporter = createTransporter();
@@ -243,7 +239,6 @@ const sendBulkEmails = async (recipients, template, data = {}) => {
   }
 };
 
-// Verify email configuration
 const verifyEmailConfig = async () => {
   try {
     const transporter = createTransporter();
