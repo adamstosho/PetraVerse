@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, CheckCircle, XCircle, Edit, Trash2, Search, Filter } from 'lucide-react';
+import { Eye, CheckCircle, XCircle, Trash2, Search } from 'lucide-react';
 import { adminAPI } from '../../lib/admin';
 import { toast } from 'react-hot-toast';
 import Button from '../../components/ui/Button';
@@ -223,8 +223,9 @@ const AdminPetsPage: React.FC = () => {
                             </div>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                            <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                             <select
+                                id="statusFilter"
                                 value={statusFilter}
                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setStatusFilter(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -236,8 +237,9 @@ const AdminPetsPage: React.FC = () => {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Approval</label>
+                            <label htmlFor="approvalFilter" className="block text-sm font-medium text-gray-700 mb-2">Approval</label>
                             <select
+                                id="approvalFilter"
                                 value={approvalFilter}
                                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setApprovalFilter(e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

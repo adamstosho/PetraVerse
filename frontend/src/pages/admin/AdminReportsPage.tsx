@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   AlertTriangle, 
-  Search, 
-  Filter,
+  
   MoreVertical,
   Eye,
   CheckCircle,
@@ -18,7 +17,6 @@ import {
 import { adminAPI } from '../../lib/admin';
 import { Report } from '../../types';
 import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
 import Card from '../../components/ui/Card';
 import toast from 'react-hot-toast';
 
@@ -89,7 +87,7 @@ const AdminReportsPage: React.FC = () => {
       spam: { color: 'bg-red-100 text-red-800', icon: Flag },
       inappropriate: { color: 'bg-orange-100 text-orange-800', icon: AlertTriangle },
       fake: { color: 'bg-purple-100 text-purple-800', icon: XCircle },
-      duplicate: { color: 'bg-gray-100 text-gray-800', icon: Copy },
+      duplicate: { color: 'bg-gray-100 text-gray-800', icon: MoreVertical },
       other: { color: 'bg-gray-100 text-gray-800', icon: MoreVertical }
     };
 
@@ -157,7 +155,9 @@ const AdminReportsPage: React.FC = () => {
           <Card className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
+                <label htmlFor="statusFilter" className="sr-only">Status</label>
                 <select
+                  id="statusFilter"
                   value={filters.status}
                   onChange={(e) => handleFilterChange('status', e.target.value)}
                   className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -171,7 +171,9 @@ const AdminReportsPage: React.FC = () => {
               </div>
 
               <div>
+                <label htmlFor="typeFilter" className="sr-only">Type</label>
                 <select
+                  id="typeFilter"
                   value={filters.type}
                   onChange={(e) => handleFilterChange('type', e.target.value)}
                   className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -188,7 +190,9 @@ const AdminReportsPage: React.FC = () => {
               </div>
 
               <div>
+                <label htmlFor="priorityFilter" className="sr-only">Priority</label>
                 <select
+                  id="priorityFilter"
                   value={filters.priority}
                   onChange={(e) => handleFilterChange('priority', e.target.value)}
                   className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"

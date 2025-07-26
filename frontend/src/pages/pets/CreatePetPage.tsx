@@ -6,13 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { 
-  Heart, 
   Upload, 
-  X, 
-  MapPin,
-  Calendar,
-  Tag,
-  FileText
+  X
+ 
 } from 'lucide-react';
 import { petsAPI } from '../../lib/pets';
 import Button from '../../components/ui/Button';
@@ -48,8 +44,6 @@ const CreatePetPage: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
-    setValue,
   } = useForm<CreatePetFormData>({
     resolver: zodResolver(createPetSchema),
     defaultValues: {
@@ -210,6 +204,7 @@ const CreatePetPage: React.FC = () => {
                           type="button"
                           onClick={() => removePhoto(index)}
                           className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                          title="Remove photo"
                         >
                           <X className="w-3 h-3" />
                         </button>
