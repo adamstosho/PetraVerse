@@ -164,13 +164,13 @@ const Footer: React.FC = () => {
               © {currentYear} PetraVerse. All rights reserved.
             </p>
             <p className="text-neutral-400 text-sm mt-2 md:mt-0 flex items-center">
-              Made with 
+              Built with
               <motion.span
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 1, repeat: Infinity }}
                 className="mx-1 text-primary-400"
               >
-                ❤️
+                💖💖 by ART_Redox
               </motion.span>
               for pets and their families
             </p>
