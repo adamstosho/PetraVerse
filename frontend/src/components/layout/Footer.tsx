@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Heart, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import PetraVerseLogo from './PetraVerseLogo';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -30,19 +31,9 @@ const Footer: React.FC = () => {
               viewport={{ once: true }}
             >
               <Link to="/" className="inline-flex items-center space-x-3 mb-6 group">
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  className="relative"
-                >
-                  <Heart className="w-10 h-10 text-primary-400 drop-shadow-sm" />
-                  <motion.div
-                    className="absolute inset-0 w-10 h-10 bg-primary-400 rounded-full opacity-20"
-                    animate={{ scale: [1, 1.2, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                  />
-                </motion.div>
+                <PetraVerseLogo size={44} />
                 <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">
-                  PetConnect
+                  PetraVerse
                 </span>
               </Link>
               <p className="text-neutral-300 mb-6 max-w-md leading-relaxed">
@@ -170,7 +161,7 @@ const Footer: React.FC = () => {
         >
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-neutral-400 text-sm">
-              © {currentYear} PetConnect. All rights reserved.
+              © {currentYear} PetraVerse. All rights reserved.
             </p>
             <p className="text-neutral-400 text-sm mt-2 md:mt-0 flex items-center">
               Made with 

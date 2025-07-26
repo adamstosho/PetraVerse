@@ -123,7 +123,7 @@ const RegisterPage: React.FC = () => {
                 />
               </motion.div>
               <span className="text-3xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-                PetConnect
+                PetraVerse
               </span>
             </Link>
             

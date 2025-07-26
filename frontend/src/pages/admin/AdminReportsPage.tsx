@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   AlertTriangle, 
-  
   MoreVertical,
-  Eye,
   CheckCircle,
   XCircle,
   Clock,
@@ -12,7 +10,8 @@ import {
   Heart,
   Flag,
   Calendar,
-  MessageSquare
+  Check,
+  X
 } from 'lucide-react';
 import { adminAPI } from '../../lib/admin';
 import { Report } from '../../types';
@@ -61,10 +60,21 @@ const AdminReportsPage: React.FC = () => {
     setCurrentPage(1);
   };
 
+  const handleUpdateStatus = async (reportId: string, status: string) => {
+    try {
+      await adminAPI.updateReport(reportId, { status });
+      toast.success(`Report marked as ${status.replace('_', ' ')}`);
+      fetchReports(); // Refresh the list
+    } catch (error: any) {
+      console.error('Failed to update report status:', error);
+      toast.error('Failed to update report status');
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       pending: { color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-      under_review: { color: 'bg-blue-100 text-blue-800', icon: Eye },
+      under_review: { color: 'bg-blue-100 text-blue-800', icon: Clock },
       resolved: { color: 'bg-green-100 text-green-800', icon: CheckCircle },
       dismissed: { color: 'bg-red-100 text-red-800', icon: XCircle }
     };
@@ -296,18 +306,31 @@ const AdminReportsPage: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end space-x-2">
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
-                            onClick={() => {/* TODO: View report details */}}
+                            onClick={() => handleUpdateStatus(report._id, 'under_review')}
+                            disabled={report.status === 'under_review'}
+                            title="Mark as Under Review"
                           >
-                            <Eye className="w-4 h-4" />
+                            <Clock className="w-4 h-4" />
                           </Button>
                           <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
-                            onClick={() => {/* TODO: Review report */}}
+                            onClick={() => handleUpdateStatus(report._id, 'resolved')}
+                            disabled={report.status === 'resolved'}
+                            title="Mark as Resolved"
                           >
-                            <MessageSquare className="w-4 h-4" />
+                            <Check className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleUpdateStatus(report._id, 'dismissed')}
+                            disabled={report.status === 'dismissed'}
+                            title="Dismiss Report"
+                          >
+                            <X className="w-4 h-4" />
                           </Button>
                         </div>
                       </td>

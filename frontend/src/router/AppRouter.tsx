@@ -27,6 +27,7 @@ import AdminDashboard from '../pages/admin/AdminDashboard';
 import AdminPetsPage from '../pages/admin/AdminPetsPage';
 import AdminUsersPage from '../pages/admin/AdminUsersPage';
 import AdminReportsPage from '../pages/admin/AdminReportsPage';
+import LandingPage from '../pages/LandingPage';
 
 const AppRouter: React.FC = () => {
   const { user } = useAuthStore();
@@ -40,17 +41,15 @@ const AppRouter: React.FC = () => {
         <Route path="/forgot-password" element={!user ? <ForgotPasswordPage /> : <Navigate to="/dashboard" />} />
         <Route path="/reset-password/:token" element={!user ? <ResetPasswordPage /> : <Navigate to="/dashboard" />} />
 
-        {/* Protected Routes */}
+        {/* Landing Page */}
+        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <LandingPage />} />
+
+        {/* Protected Routes with Layout */}
         <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-          <Route index element={<Navigate to="/dashboard" />} />
-          
-          {/* User Routes */}
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="notifications" element={<NotificationsPage />} />
-          
-          {/* Pet Routes - Order matters! */}
           <Route path="pets/create" element={<CreatePetPage />} />
           <Route path="pets/my-pets" element={<MyPetsPage />} />
           <Route path="pets/:id" element={<PetDetailPage />} />
@@ -66,7 +65,7 @@ const AppRouter: React.FC = () => {
         </Route>
 
         {/* 404 Route */}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} />} />
       </Routes>
     </Router>
   );

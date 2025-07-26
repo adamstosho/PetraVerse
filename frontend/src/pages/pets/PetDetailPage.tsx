@@ -11,13 +11,17 @@ import {
   MessageCircle,
   Share2,
   Flag,
-  ArrowLeft
+  ArrowLeft,
+  Copy,
+  X
 } from 'lucide-react';
 import { petsAPI } from '../../lib/pets';
+import { reportsAPI } from '../../lib/reports';
 import { Pet, ContactRequest } from '../../types';
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import Input from '../../components/ui/Input';
+import { useAuthStore } from '../../store/auth';
 
 const PetDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,12 +29,18 @@ const PetDetailPage: React.FC = () => {
   const [pet, setPet] = useState<Pet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
   const [contactForm, setContactForm] = useState<ContactRequest>({
     name: '',
     email: '',
     phone: '',
     message: '',
   });
+  const [reportForm, setReportForm] = useState({
+    reason: '',
+    description: ''
+  });
+  const { user } = useAuthStore();
 
   useEffect(() => {
     const fetchPet = async () => {
@@ -61,6 +71,42 @@ const PetDetailPage: React.FC = () => {
       setContactForm({ name: '', email: '', phone: '', message: '' });
     } catch (error: any) {
       toast.error(error.message || 'Failed to send message');
+    }
+  };
+
+  const handleShare = async () => {
+    try {
+      const currentUrl = window.location.href;
+      await navigator.clipboard.writeText(currentUrl);
+      toast.success('Link copied to clipboard!');
+    } catch (error) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = window.location.href;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      toast.success('Link copied to clipboard!');
+    }
+  };
+
+  const handleReportSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id || !user) return;
+
+    try {
+      await reportsAPI.createReport({
+        type: 'pet_post',
+        reason: reportForm.reason,
+        description: reportForm.description,
+        reportedPetId: id
+      });
+      toast.success('Report submitted successfully!');
+      setShowReportModal(false);
+      setReportForm({ reason: '', description: '' });
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to submit report');
     }
   };
 
@@ -125,15 +171,95 @@ const PetDetailPage: React.FC = () => {
               </p>
             </div>
             <div className="flex space-x-2">
-              <Button variant="outline" leftIcon={<Share2 className="w-4 h-4" />}>
+              <Button 
+                variant="outline" 
+                leftIcon={<Share2 className="w-4 h-4" />}
+                onClick={handleShare}
+              >
                 Share
               </Button>
-              <Button variant="outline" leftIcon={<Flag className="w-4 h-4" />}>
+              <Button 
+                variant="outline" 
+                leftIcon={<Flag className="w-4 h-4" />}
+                onClick={() => setShowReportModal(true)}
+              >
                 Report
               </Button>
             </div>
           </div>
         </motion.div>
+
+        {/* Report Modal */}
+        {showReportModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">Report Pet Post</h3>
+                <button
+                  onClick={() => setShowReportModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                  title="Close modal"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <form onSubmit={handleReportSubmit} className="space-y-4">
+                <div>
+                  <label htmlFor="reportReason" className="block text-sm font-medium text-gray-700 mb-2">
+                    Reason for Report
+                  </label>
+                  <select
+                    id="reportReason"
+                    value={reportForm.reason}
+                    onChange={(e) => setReportForm(prev => ({ ...prev, reason: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg p-2"
+                    required
+                  >
+                    <option value="">Select a reason</option>
+                    <option value="inappropriate">Inappropriate content</option>
+                    <option value="fake">Fake or misleading information</option>
+                    <option value="spam">Spam</option>
+                    <option value="duplicate">Duplicate post</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={reportForm.description}
+                    onChange={(e) => setReportForm(prev => ({ ...prev, description: e.target.value }))}
+                    rows={4}
+                    className="w-full border border-gray-300 rounded-lg p-2"
+                    placeholder="Please provide additional details about your report..."
+                    required
+                  />
+                </div>
+                
+                <div className="flex space-x-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setShowReportModal(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    variant="primary"
+                    className="flex-1"
+                  >
+                    Submit Report
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
@@ -258,66 +384,59 @@ const PetDetailPage: React.FC = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Contact Owner */}
-            <Card>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact Owner</h2>
-              {!showContactForm ? (
-                <Button
-                  onClick={() => setShowContactForm(true)}
-                  className="w-full"
-                  leftIcon={<MessageCircle className="w-4 h-4" />}
-                >
-                  Contact Owner
-                </Button>
-              ) : (
-                <form onSubmit={handleContactSubmit} className="space-y-4">
-                  <Input
-                    label="Your Name"
-                    value={contactForm.name}
-                    onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
-                    required
-                  />
-                  <Input
-                    label="Email"
-                    type="email"
-                    value={contactForm.email}
-                    onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
-                    required
-                  />
-                  <Input
-                    label="Phone"
-                    type="tel"
-                    value={contactForm.phone}
-                    onChange={(e) => setContactForm(prev => ({ ...prev, phone: e.target.value }))}
-                    required
-                  />
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Message
-                    </label>
-                    <textarea
-                      value={contactForm.message}
-                      onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
-                      rows={4}
-                      className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="Tell the owner about your message..."
+            {user?.role !== 'admin' && (
+              <Card>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact Owner</h2>
+                {!showContactForm ? (
+                  <Button
+                    onClick={() => setShowContactForm(true)}
+                    className="w-full"
+                    leftIcon={<MessageCircle className="w-4 h-4" />}
+                  >
+                    Contact Owner
+                  </Button>
+                ) : (
+                  <form onSubmit={handleContactSubmit} className="space-y-4">
+                    <Input
+                      label="Your Name"
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm(prev => ({ ...prev, name: e.target.value }))}
+                      required
                     />
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setShowContactForm(false)}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit" className="flex-1">
+                    <Input
+                      label="Email"
+                      type="email"
+                      value={contactForm.email}
+                      onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
+                      required
+                    />
+                    <Input
+                      label="Phone"
+                      type="tel"
+                      value={contactForm.phone}
+                      onChange={(e) => setContactForm(prev => ({ ...prev, phone: e.target.value }))}
+                      required
+                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Message
+                      </label>
+                      <textarea
+                        value={contactForm.message}
+                        onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))}
+                        rows={4}
+                        className="w-full border border-gray-300 rounded-lg p-2"
+                        required
+                        placeholder="Tell the owner about your message..."
+                      />
+                    </div>
+                    <Button type="submit" className="w-full" variant="primary">
                       Send Message
                     </Button>
-                  </div>
-                </form>
-              )}
-            </Card>
+                  </form>
+                )}
+              </Card>
+            )}
 
             {/* Owner Information */}
             <Card>

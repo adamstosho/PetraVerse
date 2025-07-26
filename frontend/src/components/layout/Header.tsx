@@ -18,6 +18,7 @@ import { useAuthStore } from '../../store/auth';
 import { authAPI } from '../../lib/auth';
 import { notificationsAPI } from '../../lib/notifications';
 import Button from '../ui/Button';
+import PetraVerseLogo from './PetraVerseLogo';
 
 const Header: React.FC = () => {
   const { user, isAuthenticated, clearAuth } = useAuthStore();
@@ -63,19 +64,9 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3 group">
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              className="relative"
-            >
-              <Heart className="w-8 h-8 text-primary-500 drop-shadow-sm" />
-              <motion.div
-                className="absolute inset-0 w-8 h-8 bg-primary-500 rounded-full opacity-20"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
-            </motion.div>
+            <PetraVerseLogo size={40} />
             <span className="text-xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-              PetConnect
+              PetraVerse
             </span>
           </Link>
 

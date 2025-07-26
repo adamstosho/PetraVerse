@@ -78,7 +78,7 @@ const LoginPage: React.FC = () => {
         <div className="text-center">
           <Link to="/" className="flex items-center justify-center space-x-2 mb-8">
             <Heart className="w-8 h-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">PetConnect</span>
+            <span className="text-2xl font-bold text-gray-900">PetraVerse</span>
           </Link>
           <h2 className="text-3xl font-bold text-gray-900">Welcome back</h2>
           <p className="mt-2 text-gray-600">

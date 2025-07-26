@@ -426,6 +426,18 @@ const updateReport = asyncHandler(async (req, res) => {
     throw new Error('Report not found');
   }
 
+  // Validate status if provided
+  if (status && !['pending', 'under_review', 'resolved', 'dismissed'].includes(status)) {
+    res.status(400);
+    throw new Error('Invalid status value');
+  }
+
+  // Validate priority if provided
+  if (priority && !['low', 'medium', 'high', 'urgent'].includes(priority)) {
+    res.status(400);
+    throw new Error('Invalid priority value');
+  }
+
   if (status) report.status = status;
   if (priority) report.priority = priority;
   if (adminNotes !== undefined) report.adminNotes = adminNotes;
@@ -437,6 +449,13 @@ const updateReport = asyncHandler(async (req, res) => {
     report.resolvedAt = new Date();
     report.actionTakenBy = req.user._id;
     report.actionTakenAt = new Date();
+  }
+
+  if (status === 'dismissed' && !report.isResolved) {
+    report.isResolved = true;
+    report.resolvedAt = new Date();
+    report.reviewedBy = req.user._id;
+    report.reviewedAt = new Date();
   }
 
   const updatedReport = await report.save();

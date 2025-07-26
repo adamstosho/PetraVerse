@@ -3,11 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   Users, 
   Search, 
-  Filter,
-  MoreVertical,
-  Edit,
   Trash2,
-  Eye,
   Mail,
   Phone,
   Calendar,
@@ -170,7 +166,9 @@ const AdminUsersPage: React.FC = () => {
               </div>
               
               <div>
+                <label htmlFor="roleFilter" className="block text-sm font-medium text-gray-700 mb-2">Role</label>
                 <select
+                  id="roleFilter"
                   value={filters.role}
                   onChange={(e) => handleFilterChange('role', e.target.value)}
                   className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -184,7 +182,9 @@ const AdminUsersPage: React.FC = () => {
               </div>
 
               <div>
+                <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-2">Status</label>
                 <select
+                  id="statusFilter"
                   value={filters.isActive}
                   onChange={(e) => handleFilterChange('isActive', e.target.value)}
                   className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -301,20 +301,6 @@ const AdminUsersPage: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end space-x-2">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {/* TODO: View user details */}}
-                          >
-                            <Eye className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {/* TODO: Edit user */}}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
                           <Button
                             variant="ghost"
                             size="sm"

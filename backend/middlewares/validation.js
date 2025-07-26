@@ -418,6 +418,22 @@ const validateReport = [
     .isURL()
     .withMessage('Evidence must be a valid URL'),
   
+  // Custom validation to ensure at least one target is specified
+  (req, res, next) => {
+    if (!req.body.reportedUserId && !req.body.reportedPetId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation failed',
+        errors: [{
+          field: 'target',
+          message: 'Must specify either a user or pet to report',
+          value: null
+        }]
+      });
+    }
+    next();
+  },
+  
   handleValidationErrors
 ];
 
