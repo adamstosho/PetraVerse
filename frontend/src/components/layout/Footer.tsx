@@ -46,33 +46,33 @@ const Footer: React.FC = () => {
                 </span>
               </Link>
               <p className="text-neutral-300 mb-6 max-w-md leading-relaxed">
-                Helping lost pets find their way home. Join our community and make a difference in the lives of pets and their families.
+                Helping lost pets find their way home. 
               </p>
               
               {/* Contact Info */}
               <div className="space-y-3 mb-6">
                 <div className="flex items-center space-x-3 text-neutral-300">
                   <Mail className="w-4 h-4 text-primary-400" />
-                  <span>support@petconnect.com</span>
+                  <span>omoridoh111@gmail.com</span>
                 </div>
                 <div className="flex items-center space-x-3 text-neutral-300">
                   <Phone className="w-4 h-4 text-primary-400" />
-                  <span>+1 (555) 123-4567</span>
+                  <span>+234 (903) 329-5837</span>
                 </div>
                 <div className="flex items-center space-x-3 text-neutral-300">
                   <MapPin className="w-4 h-4 text-primary-400" />
-                  <span>123 Pet Street, Animal City, AC 12345</span>
+                  <span>Pegamut, Otta, Ogun State, Nigeria</span>
                 </div>
               </div>
 
               {/* Social Links */}
               <div className="flex space-x-4">
                 {[
-                  { icon: Facebook, href: "#", label: "Facebook" },
-                  { icon: Twitter, href: "#", label: "Twitter" },
-                  { icon: Instagram, href: "#", label: "Instagram" },
-                  { icon: Youtube, href: "#", label: "YouTube" }
-                ].map((social, index) => (
+                  { icon: Facebook, href: "https://web.facebook.com/profile.php?id=100075090454452", label: "Facebook" },
+                  { icon: Twitter, href: "https://x.com/artredox01", label: "Twitter" },
+                  { icon: Instagram, href: "https://www.instagram.com/", label: "Instagram" },
+                  { icon: Youtube, href: "https://www.youtube.com", label: "YouTube" }
+                ].map((social) => (
                   <motion.a
                     key={social.label}
                     href={social.href}
@@ -103,7 +103,7 @@ const Footer: React.FC = () => {
                 { to: "/search", label: "Search Pets" },
                 { to: "/dashboard", label: "Dashboard" },
                 { to: "/profile", label: "Profile" },
-                { to: "/", label: "How It Works" }
+              
               ].map((link, index) => (
                 <motion.li
                   key={link.label}
@@ -138,8 +138,8 @@ const Footer: React.FC = () => {
               {[
                 { href: "#", label: "Help Center" },
                 { href: "#", label: "Contact Us" },
-                { href: "#", label: "Privacy Policy" },
-                { href: "#", label: "Terms of Service" }
+                
+                
               ].map((link, index) => (
                 <motion.li
                   key={link.label}
